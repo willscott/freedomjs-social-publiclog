@@ -1,0 +1,22 @@
+{
+  "name": "freedomjs-social-publiclog",
+  "version": "0.0.0",
+  "description": "freedomjs social provider backed by a public log",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/willscott/freedomjs-social-publiclog.git"
+  },
+  "keywords": [
+    "freedomjs"
+  ],
+  "author": "Will Scott (https://wills.co.tt)",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/willscott/freedomjs-social-publiclog/issues"
+  },
+  "homepage": "https://github.com/willscott/freedomjs-social-publiclog"
+}
