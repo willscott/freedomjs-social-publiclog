@@ -16,7 +16,8 @@ function LogSocialProvider(dispatchEvent) {
 
   this.url = null;
   this.id = null;     // userId of this user
-  this.user = Math.random();
+  this.user = 'U.' + Math.random();
+  this.lastScan = 0;
   
   this.users = {};    // List of seen users (<user_profile>)
   this.clients = {};  // List of seen clients (<client_state>)
@@ -167,11 +168,26 @@ LogSocialProvider.prototype.beginMonitoring = function () {
     if (resp.items) {
       resp.items.forEach(function (item) {
         this.changeRoster(item.from, true);
-        if (item.msg.indexOf(this.user) > 0) {
-          this.dispatchEvent('onMessage', {
-            from: item.from,
-            message: JSON.parse(item.msg).msg
-          });
+        console.warn(this.user);
+        try {
+          var actualMsg = JSON.parse(item.msg);
+          if (actualMsg.to === this.user && new Date(item.time) > this.lastScan) {
+            this.dispatchEvent('onMessage', {
+              from: {
+                userId: item.from,
+                clientId: item.from,
+                status: 'ONLINE',
+                lastUpdated: item.time,
+                lastSeen: item.time
+              },
+              message: actualMsg.msg
+            });
+          }
+        } catch (e) {
+          return;
+        }
+        if (new Date(item.time) > this.lastScan) {
+          this.lastScan = new Date(item.time);
         }
       }.bind(this));
     }
