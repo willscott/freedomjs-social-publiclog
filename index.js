@@ -44,7 +44,20 @@ LogSocialProvider.prototype.login = function (loginOpts, continuation) {
   this.url = loginOpts.url;
   this.agent = loginOpts.agent;
   this.beginMonitoring();
-  this.write('ONLINE', continuation);
+  this.write('ONLINE', function (continuation, resp) {
+    if (resp.success) {
+      continuation({
+        userId: this.user,
+        clientId: this.user,
+        status: 'ONLINE'
+      });
+    } else {
+      continuation(undefined, {
+        errcode: "LOGIN_FAILEDCONNECTION",
+        message: resp.success
+      });
+    }
+  }.bind(this, continuation));
 };
 
 
@@ -115,7 +128,9 @@ LogSocialProvider.prototype.sendMessage = function (to, msg, continuation) {
   }
 
   //post
-  this.write(JSON.stringify({to: to, msg: msg}), continuation);
+  this.write(JSON.stringify({to: to, msg: msg}), function () {
+    continuation();
+  });
 };
 
 /**
@@ -160,7 +175,7 @@ LogSocialProvider.prototype.beginMonitoring = function () {
         }
       }.bind(this));
     }
-    setTimeout(this.beginMonitoring.bind(this), 1000);
+    setTimeout(this.beginMonitoring.bind(this), 10000);
   }.bind(this);
   
   // TODO: use core API for jsonp.
@@ -172,7 +187,7 @@ var onWrite;
 LogSocialProvider.prototype.write = function (msg, cb) {
   onWrite = cb;
   
-  importScripts(this.url + "?callback=onWrite&dest=" + this.agent + "&from=" + this.user + "&msg=" + msg);
+  importScripts(this.url + "?callback=onWrite&dest=" + this.agent + "&src=" + this.user + "&msg=" + msg);
 };
 
 /**
